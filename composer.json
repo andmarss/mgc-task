@@ -1,0 +1,19 @@
+{
+    "name": "andrey/giving-easy-task",
+    "authors": [
+        {
+            "name": "Андрей Марков",
+            "email": "anrey-markov@mail.ru"
+        }
+    ],
+    "require": {
+        "ext-json": "*",
+        "ext-simplexml": "*",
+        "guzzlehttp/guzzle": "^6.5"
+    },
+    "autoload": {
+        "classmap": [
+            "./"
+        ]
+    }
+}
