@@ -2,13 +2,9 @@
 
 namespace App\Http;
 
-use App\Api\MGCApi;
 use App\Models\Category;
-use App\Models\Parameter;
 use App\Models\Product;
 use App\System\Collection;
-use App\System\Database\QueryBuilder;
-use App\System\Filesystem\File;
 use App\System\Request;
 
 class MainController extends Controller
