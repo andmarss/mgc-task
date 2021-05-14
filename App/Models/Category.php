@@ -3,8 +3,6 @@
 namespace App\Models;
 use App\Pivots\ParameterPivot;
 use App\System\Collection;
-use App\System\Database\QueryBuilder;
-use App\System\Database\Relations\BelongsTo;
 use App\System\Database\Relations\BelongsToMany;
 use App\System\Database\Relations\HasMany;
 use App\System\Database\Relations\HasOne;
