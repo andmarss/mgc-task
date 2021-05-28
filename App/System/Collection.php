@@ -82,21 +82,25 @@ class Collection implements \Countable, \ArrayAccess, \JsonSerializable, \Iterat
      * Аналог array_filter
      */
 
-    public function filter(\Closure $func): Collection
+    public function filter(\Closure $func = null): Collection
     {
         $result = [];
 
-        foreach ($this->collection as $key => $item) {
-            if($func($item, $key, $this->collection)) {
-                if (!is_numeric($key)) {
-                    $result[$key] = $item;
-                } else {
-                    $result[] = $item;
+        if ($func) {
+            foreach ($this->collection as $key => $item) {
+                if($func($item, $key, $this->collection)) {
+                    if (!is_numeric($key)) {
+                        $result[$key] = $item;
+                    } else {
+                        $result[] = $item;
+                    }
                 }
             }
-        }
 
-        $this->collection = $result;
+            $this->collection = $result;
+        } else {
+            $this->collection = array_filter($this->collection);
+        }
 
         return $this;
     }

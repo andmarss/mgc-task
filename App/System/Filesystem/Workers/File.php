@@ -72,6 +72,9 @@ class File
          * @var string $path
          */
         $path = $this->path(true);
+
+        if ($path === $compareWith) return $path;
+
         /**
          * @var string $realpath
          */
@@ -84,31 +87,48 @@ class File
          * @var array $to
          */
         $to = explode( DIRECTORY_SEPARATOR, $path );
-        /**
-         * @var int $i
-         */
-        $i = 0;
-        // находим место, где пути расходятся
-        while ( isset($from[$i]) && isset($to[$i]) ) {
-            if ( $from[$i] != $to[$i] ) break;
-            $i++;
+        // Если самые первые папки НЕ совпадают - значит, нужно двигаться к корневой папке системы
+        // массивы фильтруются, что бы убрать пустые '' строки в значениях
+        if (collect($from)->filter()->values()->first() !== collect($to)->filter()->values()->first()) {
+            // сравниваем два массива, узнаем, насколько нужно "уйти" назад от текущей позиции
+            $diff = array_diff($from, $to);
+            // считаем количество шагов назад И формируем шаги назад
+            $dots = str_repeat('..' . DIRECTORY_SEPARATOR, count($diff));
+            // теперь нужно получить разницу между файлом К которому мы идем, и файлом, ОТ которого
+            $toDiff = array_diff($to, $from);
+            // получаем общие для обоих путей имена папок
+            $intersect = collect(array_intersect($to, $from))->filter()->values()->all();
+            // собираем новый путь
+            $realpath = $dots . implode(DIRECTORY_SEPARATOR, $toDiff) . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $intersect);
+
+            return rtrim($realpath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $this->name();
+        } else {
+            /**
+             * @var int $i
+             */
+            $i = 0;
+            // находим место, где пути расходятся
+            while ( isset($from[$i]) && isset($to[$i]) ) {
+                if ( $from[$i] != $to[$i] ) break;
+                $i++;
+            }
+            /**
+             * @var int $j
+             */
+            $j = count( $from ) - 1;
+            // Добавляем .. пока пути не станут одинаковыми
+            while ($i <= $j) {
+                if( !empty($from[$j]) ) $realpath .= '..' . '/';
+                $j--;
+            }
+            // Идем от совпадающей с путями папку до той, которая нужна
+            while ( isset( $to[$i] ) ) {
+                if( !empty( $to[$i] ) ) $realpath .= $to[$i] . '/';
+                $i++;
+            }
+            // возвращаем относительный путь
+            return $realpath . $this->name();
         }
-        /**
-         * @var int $j
-         */
-        $j = count( $from ) - 1;
-        // Добавляем .. пока пути не станут одинаковыми
-        while ($i <= $j) {
-            if( !empty($from[$j]) ) $realpath .= '..' . '/';
-            $j--;
-        }
-        // Идем от совпадающей с путями папку до той, которая нужна
-        while ( isset( $to[$i] ) ) {
-            if( !empty( $to[$i] ) ) $realpath .= $to[$i] . '/';
-            $i++;
-        }
-        // возвращаем относительный путь
-        return $realpath . $this->name();
     }
 
     /**
